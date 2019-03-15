@@ -4,15 +4,23 @@
 #define USERNAME "rts"
 #define PASSWORD "rts"
 
+EventGroupHandle_t mqtt_event_group;
 static esp_mqtt_client_handle_t client;
 static vector<string> TopicStore;
+const int CONNECTED_BIT = BIT0;
+static volatile bool connected = false;
 
 static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
 {
     switch (event->event_id) {
+        case MQTT_EVENT_BEFORE_CONNECT:
+            break;
         case MQTT_EVENT_CONNECTED:
+            xEventGroupSetBits(mqtt_event_group, CONNECTED_BIT);
             break;
         case MQTT_EVENT_DISCONNECTED:
+            esp_mqtt_client_start(client);
+            xEventGroupClearBits(mqtt_event_group, CONNECTED_BIT);
             break;
         case MQTT_EVENT_SUBSCRIBED:
             break;
@@ -29,7 +37,7 @@ static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
 }
 
 Mqtt::Mqtt() {
-
+    mqtt_event_group = xEventGroupCreate();
 }
 
 void Mqtt::Init() {
@@ -41,12 +49,21 @@ void Mqtt::Init() {
     MqttConf.event_handle = mqtt_event_handler;
     
     client = esp_mqtt_client_init(&MqttConf);
-    esp_mqtt_client_start(client);
+    // esp_mqtt_client_start(client);
 }
 
 void Mqtt::Init(esp_mqtt_client_config_t MqttConfArg) {
     client = esp_mqtt_client_init(&MqttConfArg);
+    // esp_mqtt_client_start(client);
+}
+
+void Mqtt::Connect() {
     esp_mqtt_client_start(client);
+    xEventGroupWaitBits(mqtt_event_group, CONNECTED_BIT, false, true, portMAX_DELAY);
+}
+
+void Mqtt::Disconnect() {
+    esp_mqtt_client_stop(client);
 }
 
 int Mqtt::Publish(const char * topic, char *payload, int length, int qos, int retain) {
@@ -63,7 +80,7 @@ esp_err_t Mqtt::Unsubscribe(const char *topic) {
 }
 
 Mqtt::~Mqtt() {
-    esp_mqtt_client_destroy(client);
+    // esp_mqtt_client_destroy(client);
 }
 
 vector<string> Mqtt::GetSubscribedTopic(void) {
