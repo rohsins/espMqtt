@@ -10,6 +10,8 @@
 
 using namespace std;
 
+typedef void (*subscribeListener)(esp_mqtt_event_handle_t er);
+
 class Mqtt {
     public:
         Mqtt();
@@ -18,7 +20,7 @@ class Mqtt {
         void Connect();
         void Disconnect();
         int Publish(const char * topic, char *payload, int lenght, int qos, int retain);
-        esp_err_t Subscribe(const char *topic, int qos);
+        subscribeListener* Subscribe(const char *topic, int qos);
         esp_err_t Unsubscribe(const char *topic);
         vector<string> GetSubscribedTopic(void);
         ~Mqtt();

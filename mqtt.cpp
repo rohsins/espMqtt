@@ -10,6 +10,8 @@ static vector<string> TopicStore;
 const int CONNECTED_BIT = BIT0;
 static volatile bool connected = false;
 
+subscribeListener subscribeListenerInstance;
+
 static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
 {
     switch (event->event_id) {
@@ -29,6 +31,7 @@ static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
         case MQTT_EVENT_PUBLISHED:
             break;
         case MQTT_EVENT_DATA:
+            subscribeListenerInstance(event);
             break;
         case MQTT_EVENT_ERROR:
             break;
@@ -70,9 +73,10 @@ int Mqtt::Publish(const char * topic, char *payload, int length, int qos, int re
     return esp_mqtt_client_publish(client, topic, payload, length, qos, retain);
 }
 
-esp_err_t Mqtt::Subscribe(const char *topic, int qos) {
+subscribeListener* Mqtt::Subscribe(const char *topic, int qos) {
     //TopicStore.push_back(topic);
-    return esp_mqtt_client_subscribe(client, topic, qos);
+    esp_mqtt_client_subscribe(client, topic, qos);
+    return &subscribeListenerInstance;
 }
 
 esp_err_t Mqtt::Unsubscribe(const char *topic) {
