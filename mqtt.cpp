@@ -49,6 +49,9 @@ void Mqtt::Init() {
     MqttConf.uri = URI;
     MqttConf.username = USERNAME;
     MqttConf.password = PASSWORD;
+    MqttConf.keepalive = 30000;
+    MqttConf.disable_clean_session = 1;
+    MqttConf.disable_auto_reconnect = false;
     MqttConf.event_handle = mqtt_event_handler;
     
     client = esp_mqtt_client_init(&MqttConf);
