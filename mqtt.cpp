@@ -1,6 +1,6 @@
 #include "mqtt.h"
 
-#define URI "mqtt://hardware.wscada.net"
+#define URI "mqtt://rohitsingh.com.np"
 #define USERNAME "rts"
 #define PASSWORD "rts"
 
@@ -49,8 +49,8 @@ void Mqtt::Init() {
     MqttConf.uri = URI;
     MqttConf.username = USERNAME;
     MqttConf.password = PASSWORD;
-    MqttConf.keepalive = 30000;
-    MqttConf.disable_clean_session = 1;
+    MqttConf.keepalive = 30;
+    MqttConf.disable_clean_session = 0;
     MqttConf.disable_auto_reconnect = false;
     MqttConf.event_handle = mqtt_event_handler;
     
