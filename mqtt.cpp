@@ -1,8 +1,9 @@
 #include "mqtt.h"
 
-#define URI "mqtt://rohitsingh.com.np"
-#define USERNAME "rts"
-#define PASSWORD "rts"
+#define URI "mqtt://developer.wscada.net"
+#define URITLS "mqtts://developer.wscada.net"
+#define USERNAME "rtshardware"
+#define PASSWORD "rtshardware"
 
 EventGroupHandle_t mqtt_event_group;
 static esp_mqtt_client_handle_t client;
@@ -35,6 +36,8 @@ static esp_err_t mqtt_event_handler(esp_mqtt_event_handle_t event)
             break;
         case MQTT_EVENT_ERROR:
             break;
+        case MQTT_EVENT_ANY:
+            break;
     }
     return ESP_OK;
 }
@@ -53,6 +56,22 @@ void Mqtt::Init() {
     MqttConf.disable_clean_session = 0;
     MqttConf.disable_auto_reconnect = false;
     MqttConf.event_handle = mqtt_event_handler;
+    
+    client = esp_mqtt_client_init(&MqttConf);
+    // esp_mqtt_client_start(client);
+}
+
+void Mqtt::Init(const char * certificate) {
+    static esp_mqtt_client_config_t MqttConf;
+    
+    MqttConf.uri = URITLS;
+    MqttConf.username = USERNAME;
+    MqttConf.password = PASSWORD;
+    MqttConf.keepalive = 30;
+    MqttConf.disable_clean_session = 0;
+    MqttConf.disable_auto_reconnect = false;
+    MqttConf.event_handle = mqtt_event_handler;
+    MqttConf.cert_pem = certificate;
     
     client = esp_mqtt_client_init(&MqttConf);
     // esp_mqtt_client_start(client);

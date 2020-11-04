@@ -1,3 +1,6 @@
+#ifndef _mqtt_h_
+#define _mqtt_h_
+
 #include "mqtt_client.h"
 #include <string>
 #include <vector>
@@ -6,6 +9,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
 #include "esp_event_loop.h"
+#include "esp_tls.h"
 #include "esp_log.h"
 
 using namespace std;
@@ -16,6 +20,7 @@ class Mqtt {
     public:
         Mqtt();
         void Init();
+        void Init(const char * certificate);
         void Init(esp_mqtt_client_config_t MqttConfArg);
         void Connect();
         void Disconnect();
@@ -25,3 +30,5 @@ class Mqtt {
         vector<string> GetSubscribedTopic(void);
         ~Mqtt();
 };
+
+#endif
